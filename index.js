@@ -1,8 +1,8 @@
 const wrap_gen = g =>
   ({
-    next: x => {
+    next: () => {
       try {
-        const value = g.next(x);
+        const value = g.next();
         if (value.done) {
           return value;
         }
