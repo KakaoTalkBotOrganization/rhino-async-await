@@ -21,7 +21,7 @@ const wrap_gen = g =>
     }
   });
 
-const gen_ret = value =>
+const g_return = value =>
   ({ done: true, value: value });
 
 const awaiter = g => new Promise(resolve => {
@@ -44,7 +44,7 @@ const async = g =>
 
 module.exports = {
   async: async
-, gen_ret: gen_ret
+, g_return: g_return
 };
 
 })();
