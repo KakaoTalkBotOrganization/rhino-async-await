@@ -1,3 +1,7 @@
+(function () {
+
+const Promise = require('Promise');
+
 const wrap_gen = g =>
   ({
     next: () => {
@@ -37,4 +41,10 @@ const awaiter = g => new Promise(resolve => {
 
 const async = g =>
   awaiter(rv => wrap_gen(g(rv)()));
- 
+
+module.exports = {
+  async: async
+, gen_ret: gen_ret
+};
+
+})();
