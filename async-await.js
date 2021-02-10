@@ -1,50 +1,50 @@
 (function () {
 
-const Promise = require('Promise');
+  const Promise = require('Promise');
 
-const wrap_gen = g =>
-  ({
-    next: () => {
-      try {
-        const value = g.next();
-        if (value.done) {
-          return value;
+  const wrap_gen = g =>
+    ({
+      next: () => {
+        try {
+          const value = g.next();
+          if (value.done) {
+            return value;
+          }
+          return {
+            done: false,
+            value: value,
+          };
         }
-        return {
-          done: false
-        , value: value
-        };
-      }
-      catch (e) {
-        return { done: true };
-      }
-    }
+        catch (e) {
+          return { done: true };
+        }
+      },
+    });
+
+  const g_return = value =>
+    ({ done: true, value: value });
+
+  const awaiter = g => new Promise(resolve => {
+    let fulfilled_value;
+    const fulfilled = value => {
+      fulfilled_value = value;
+      step(g.next());
+    };
+    const step = result => {
+      result.done ?
+        resolve(result.value) :
+        new Promise(resolve => { resolve(result.value); }).then(fulfilled);
+    };
+    g = g(() => fulfilled_value);
+    step(g.next());
   });
 
-const g_return = value =>
-  ({ done: true, value: value });
+  const async = g =>
+    awaiter(rv => wrap_gen(g(rv)()));
 
-const awaiter = g => new Promise(resolve => {
-  let fulfilled_value;
-  const fulfilled = value => {
-    fulfilled_value = value;
-    step(g.next());
+  module.exports = {
+    async: async,
+    g_return: g_return,
   };
-  const step = result => {
-    result.done ?
-      resolve(result.value) :
-      new Promise(resolve => { resolve(result.value); }).then(fulfilled);
-  };
-  g = g(() => fulfilled_value);
-  step(g.next());
-});
-
-const async = g =>
-  awaiter(rv => wrap_gen(g(rv)()));
-
-module.exports = {
-  async: async
-, g_return: g_return
-};
 
 })();
